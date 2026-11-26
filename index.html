@@ -254,6 +254,51 @@
   #lyr .w.f7{font-family:"Cormorant Garamond",Garamond,Georgia,serif;font-weight:300}
   #lyr .msg{position:absolute;inset:0;display:flex;align-items:center;padding:0 6%;font:italic 400 calc(var(--k,1)*24px)/1.35 "Playfair Display",Georgia,serif;color:rgba(255,240,225,.82);text-shadow:0 1px 10px rgba(0,0,0,.7)}
 
+  /* ---------- Ajustes ---------- */
+  #setBtn{position:fixed;z-index:6;top:max(16px,env(safe-area-inset-top));right:calc(max(22px,env(safe-area-inset-right)) + 104px);width:42px;height:42px;border-radius:50%;border:0;padding:0;
+    display:grid;place-items:center;cursor:pointer;color:#fff;isolation:isolate;background:rgba(255,255,255,.035);
+    -webkit-backdrop-filter:blur(3px) saturate(135%) brightness(1.1);backdrop-filter:blur(3px) saturate(135%) brightness(1.1);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.10),inset 2px 2px 3px -2px rgba(255,255,255,.55),inset -2px -2px 3px -2px rgba(255,255,255,.25),0 6px 18px rgba(0,0,0,.18);
+    opacity:0;pointer-events:none;transform:scale(.8);transition:opacity .5s ease,transform .5s cubic-bezier(.3,1.6,.5,1),background .3s}
+  #setBtn::before{content:"";position:absolute;inset:0;border-radius:50%;padding:1px;pointer-events:none;
+    background:conic-gradient(from 210deg,rgba(255,255,255,.95),rgba(255,255,255,.15) 22%,rgba(255,255,255,.05) 35%,rgba(255,255,255,.6) 50%,rgba(255,255,255,.12) 70%,rgba(255,255,255,.05) 85%,rgba(255,255,255,.95));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+  #setBtn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45));transition:transform .8s cubic-bezier(.3,1.2,.4,1)}
+  #setBtn.on{opacity:1;pointer-events:auto;transform:none}
+  #setBtn:hover{background:rgba(255,255,255,.08)}#setBtn:hover svg{transform:rotate(60deg)}
+  #setBtn:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:3px}
+  #spchip{right:calc(max(22px,env(safe-area-inset-right)) + 158px)}
+  #set{position:fixed;inset:0;z-index:8;display:grid;place-items:center;padding:20px;visibility:hidden;opacity:0;transition:opacity .45s ease,visibility 0s linear .45s}
+  #set.on{visibility:visible;opacity:1;transition:opacity .45s ease}
+  #set .veil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.15),rgba(0,0,0,.6))}
+  .setp{position:relative;width:min(860px,100%);height:min(560px,calc(100vh - 40px));display:flex;border-radius:30px;overflow:hidden;color:#e9edf2;isolation:isolate;
+    background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02) 60%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%) brightness(.85);backdrop-filter:blur(16px) saturate(140%) brightness(.85);
+    box-shadow:inset 0 0 26px rgba(255,255,255,.06),inset 2px 2px 3px -2px rgba(255,255,255,.5),0 30px 80px rgba(0,0,0,.55);
+    transform:translateY(16px) scale(.96);transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
+  #set.on .setp{transform:none}
+  .setp::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
+    background:conic-gradient(from 210deg,rgba(255,255,255,.85),rgba(255,255,255,.12) 22%,rgba(255,255,255,.04) 35%,rgba(255,255,255,.5) 50%,rgba(255,255,255,.1) 70%,rgba(255,255,255,.04) 85%,rgba(255,255,255,.85));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+  .setnav{width:240px;flex:none;padding:26px 14px;display:flex;flex-direction:column;gap:2px;border-right:1px solid rgba(255,255,255,.08);overflow-y:auto}
+  .setnav h2{font:600 11px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:.42em;text-transform:uppercase;color:#9aa3ae;padding:4px 12px 18px}
+  .setnav button{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:14px;background:none;cursor:pointer;color:#b9c0c9;text-align:left;
+    font:500 14px/1.2 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;transition:background .25s,color .25s,box-shadow .25s}
+  .setnav button svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .setnav button:hover{color:#fff;background:rgba(255,255,255,.05)}
+  .setnav button.cur{color:#fff;background:rgba(255,255,255,.08);box-shadow:inset 1px 1px 2px -1px rgba(255,255,255,.6),inset 0 0 12px rgba(255,255,255,.06)}
+  .setnav button:focus-visible{outline:2px solid rgba(255,255,255,.7);outline-offset:-2px}
+  .setbody{flex:1;min-width:0;padding:30px 34px;overflow-y:auto;position:relative}
+  .setbody h3{font:600 24px/1.2 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;background:linear-gradient(180deg,#fff 30%,#a9b2bd);-webkit-background-clip:text;background-clip:text;color:transparent;margin-right:44px}
+  .setbody p{font-size:14px;line-height:1.55;color:#8f98a3;margin:8px 0 24px;max-width:440px}
+  .setsoon{display:grid;gap:10px}
+  .setsoon div{padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#cfd5dc}
+  .setsoon small{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#6f7884;white-space:nowrap}
+  .setx{position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;border:0;cursor:pointer;color:#aab2bd;background:rgba(255,255,255,.06);font-size:18px;line-height:1;z-index:3}
+  .setx:hover{color:#fff;background:rgba(255,255,255,.12)}
+  @media (max-width:640px){.setp{flex-direction:column;height:min(620px,calc(100vh - 40px))}.setnav{width:auto;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.08);padding:14px}
+    .setnav h2{display:none}.setnav button{width:auto;white-space:nowrap}.setbody{padding:24px 22px}}
+
   /* ---------- Habitación ---------- */
   #cozy{mix-blend-mode:screen}
   /* luz cálida de la lámpara sobre el lado izquierdo (vista Escuchar) */
@@ -553,6 +598,15 @@ window.__goLyrics=()=>{if(view!=='top'||lyr)return;lyr=true;cam(-1);back.textCon
   <div class="spcard" id="spCard"></div>
 </div>
 <div id="spchip" aria-live="polite"></div>
+<button id="setBtn" aria-label="Ajustes" title="Ajustes"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+<div id="set" role="dialog" aria-modal="true" aria-label="Ajustes" aria-hidden="true">
+  <div class="veil" id="setVeil"></div>
+  <div class="setp">
+    <nav class="setnav" id="setNav"><h2>Ajustes</h2></nav>
+    <section class="setbody" id="setBody"></section>
+    <button class="setx" id="setClose" aria-label="Cerrar">×</button>
+  </div>
+</div>
 <button id="lyrTrig" aria-label="Letra"><span>L</span><span>E</span><span>T</span><span>R</span><span>A</span></button>
 <div id="srch" aria-hidden="true">
   <div class="veil" id="srVeil"></div>
@@ -1077,6 +1131,38 @@ addEventListener('beniz:now',e=>{const d=e.detail;now={playing:d.playing,item:d.
 addEventListener('beniz:lyrics-open',()=>{open=true;updTrig();fit();box.classList.add('on');shownId=null;load();cancelAnimationFrame(raf);raf=requestAnimationFrame(tick);
   window.BenizSpotify&&window.BenizSpotify.refreshNow&&window.BenizSpotify.refreshNow()});
 addEventListener('beniz:lyrics-close',()=>{open=false;box.classList.remove('on');cancelAnimationFrame(raf);updTrig()});
+})();
+</script>
+<script>
+/* ---------- Ajustes (por ahora solo la estructura; cada apartado se irá completando) ---------- */
+(()=>{
+const $=id=>document.getElementById(id);
+const btn=$('setBtn'),box=$('set'),nav=$('setNav'),body=$('setBody'),menu=$('menu'),prod=$('prod');
+const I=p=>`<svg viewBox="0 0 24 24">${p}</svg>`;
+const SECS=[
+ {id:'pers',t:'Personalización',i:I('<circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c.9 0 1.6-.7 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16a6 6 0 0 0 6-6C22 6 17.5 2 12 2z"/>'),
+  d:'Haz Beniz a tu manera.',soon:['Muy pronto podrás personalizar Beniz desde aquí']},
+ {id:'perfil',t:'Perfil',i:I('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>'),d:'Tu nombre, tu foto y tu cuenta.',soon:['Nombre y foto','Cuenta de Spotify conectada','Cerrar sesión']},
+ {id:'luz',t:'Iluminación',i:I('<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>'),d:'La luz de la habitación y del tocadiscos.',soon:['Intensidad de la lámpara','Color de la luz','Luces que siguen el ritmo']},
+ {id:'audio',t:'Audio',i:I('<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>'),d:'Cómo suena Beniz.',soon:['Calidad de reproducción','Ecualizador','Fundido entre canciones']},
+ {id:'letra',t:'Letra',i:I('<path d="M4 6h16M4 12h10M4 18h13"/>'),d:'Cómo se ve la letra de las canciones.',soon:['Tamaño de la letra','Estilos de fuente','Mostrar la letra al empezar']},
+ {id:'notif',t:'Notificaciones',i:I('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>'),d:'Avisos y novedades.',soon:['Nuevos lanzamientos','Recordatorios']},
+ {id:'priv',t:'Privacidad',i:I('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),d:'Tus datos y permisos.',soon:['Datos guardados en este dispositivo','Permisos de Spotify']},
+ {id:'about',t:'Acerca de',i:I('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),d:'Beniz Music · versión de prueba.',soon:['Novedades','Ayuda']}];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+nav.insertAdjacentHTML('beforeend',SECS.map(x=>`<button data-s="${x.id}">${x.i}<span>${esc(x.t)}</span></button>`).join(''));
+function show(id){const x=SECS.find(y=>y.id===id)||SECS[0];
+  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('cur',b.dataset.s===x.id));
+  body.innerHTML=`<h3>${esc(x.t)}</h3><p>${esc(x.d)}</p><div class="setsoon">${x.soon.map(t=>`<div><span>${esc(t)}</span><small>Próximamente</small></div>`).join('')}</div>`;}
+nav.addEventListener('click',e=>{const b=e.target.closest('button[data-s]');if(b)show(b.dataset.s)});
+function open(){show('pers');box.classList.add('on');box.setAttribute('aria-hidden','false');setTimeout(()=>$('setClose').focus(),50)}
+function close(){box.classList.remove('on');box.setAttribute('aria-hidden','true');btn.focus()}
+btn.addEventListener('click',open);$('setClose').addEventListener('click',close);$('setVeil').addEventListener('click',close);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('on'))close()});
+// el botón se ve en la habitación y en Escuchar (no en la intro ni en Producción)
+const upd=()=>btn.classList.toggle('on',menu.classList.contains('on')&&!prod.classList.contains('on'));
+new MutationObserver(upd).observe(menu,{attributes:true,attributeFilter:['class']});
+new MutationObserver(upd).observe(prod,{attributes:true,attributeFilter:['class']});upd();
 })();
 </script>
 </body>
