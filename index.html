@@ -450,6 +450,12 @@ function cozy(now,p){const t=now/1000;czc.clearRect(0,0,czW,czH);if(p>-.2)return
 // transición de cámara: el disco de una foto se "convierte" en el de la otra
 const lerp=(a,b,p)=>a+(b-a)*p,glerp=(a,b,p)=>a*Math.pow(b/a,p);
 function place(p){const F=V.front.D,T=V.top.D,R=V.room.D,k=scene.clientWidth/1672;
+  // habitación <-> arriba directo, sin pasar por la vista de frente
+  if(direct){const q=(p+1)/2,E={cx:lerp(R.cx,T.cx,q),cy:lerp(R.cy,T.cy,q),rx:glerp(R.rx,T.rx,q),ry:glerp(R.ry,T.ry,q)};
+    const m=D=>{const sx=E.rx/D.rx,sy=E.ry/D.ry;return `translate(${((E.cx-sx*D.cx)*k).toFixed(2)}px,${((E.cy-sy*D.cy)*k).toFixed(2)}px) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;};
+    lr.style.transform=q?m(R):'';lt.style.transform=q<1?m(T):'';lf.style.opacity=0;lf.style.filter='none';
+    const b=Math.sin(Math.PI*q)*6;lr.style.filter=lt.style.filter=b>.05?`blur(${b.toFixed(2)}px)`:'none';
+    lr.style.visibility=q<1?'':'hidden';lr.style.opacity=1-eio(seg(q,.35,.8));lt.style.opacity=eio(seg(q,.3,.7));return;}
   if(p<0){const q=p+1,E={cx:lerp(R.cx,F.cx,q),cy:lerp(R.cy,F.cy,q),rx:glerp(R.rx,F.rx,q),ry:glerp(R.ry,F.ry,q)};
     const m=D=>{const sx=E.rx/D.rx,sy=E.ry/D.ry;return `translate(${((E.cx-sx*D.cx)*k).toFixed(2)}px,${((E.cy-sy*D.cy)*k).toFixed(2)}px) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;};
     lr.style.transform=q?m(R):'';lf.style.transform=q<1?m(F):'';lt.style.transform='';
@@ -461,18 +467,18 @@ function place(p){const F=V.front.D,T=V.top.D,R=V.room.D,k=scene.clientWidth/167
   lf.style.transform=p?m(F):'';lt.style.transform=p<1?m(T):'';
   const b=Math.sin(Math.PI*p)*7;lf.style.filter=lt.style.filter=b>.05?`blur(${b.toFixed(2)}px)`:'none';
   lt.style.opacity=eio(seg(p,.22,.68));lf.style.opacity=1-seg(p,.75,1);}
-let navVis=1;let view='room',camP=-1,camFrom=-1,camTo=-1,camT=0,camD=1900;const CAM=1900;
+let navVis=1,direct=false;let view='room',camP=-1,camFrom=-1,camTo=-1,camT=0,camD=1900;const CAM=1900;
 let ang=0,speed=0,last=0,t0=0,active=false,raf,mx=0,my=0,px=0,py=0;
 const RPS=33.333/60;
 function draw(now){
   const dt=Math.min(.05,(now-(last||now))/1000);last=now;const t=now-t0;
   const spin=(view==='top'||lyr)&&!window.__benizPlaying?0:RPS;if(spin)speed+=(spin-speed)*Math.min(1,dt*1.3);else speed=Math.max(0,speed-dt*.42);ang+=speed*dt*Math.PI*2;
   // cámara
-  if(camFrom!==camTo){const q=seg(now-camT,0,camD);camP=lerp(camFrom,camTo,eio(q));if(q>=1){camFrom=camTo;camP=camTo;}}
+  if(camFrom!==camTo){const q=seg(now-camT,0,camD);camP=lerp(camFrom,camTo,eio(q));if(q>=1){camFrom=camTo;camP=camTo;direct=false;}}
   place(camP);
-  if(camP<-.04)paint(V.room,ang),cozy(now,camP);
-  if(camP>-.85&&camP<1)paint(V.front,ang);
-  if(camP>.15)paint(V.top,ang);
+  if(camP<-.04&&!(direct&&camP>.7))paint(V.room,ang),cozy(now,camP);
+  if(!direct&&camP>-.85&&camP<1)paint(V.front,ang);
+  if(direct?camP>-.6:camP>.15)paint(V.top,ang);
   // entrada de la escena
   const e=eo(seg(t,0,1600));
   menu.style.opacity=1;V.room.img.style.filter=`brightness(${.15+.85*e})`;V.room.cv.style.opacity=e;cz.style.opacity=e;
@@ -487,12 +493,12 @@ function draw(now){
   if(active)raf=requestAnimationFrame(draw);
 }
 let listenT;
-function cam(to){if(camTo===to&&camFrom===to)return;camFrom=camP;camTo=to;camT=performance.now();camD=CAM*(.45+.55*Math.abs(to-camP));
+function cam(to){if(camTo===to&&camFrom===to)return;camFrom=camP;camTo=to;camT=performance.now();direct=(to===1&&camP<0)||(to===-1&&camP>0);camD=direct?CAM*1.25:CAM*(.45+.55*Math.abs(to-camP));
   view=to===1?'top':to===0?'front':'room';back.textContent=to===1?'Menú':'Intro';
   clearTimeout(listenT);if(to===1)listenT=setTimeout(()=>dispatchEvent(new Event('beniz:listen')),camD*.85);else dispatchEvent(new Event('beniz:leave'));}
 // entrar directamente en Escuchar (p. ej. al volver de iniciar sesión en Spotify)
 window.__goListen=()=>{stage.style.transition='none';stage.classList.add('leave');replay.classList.remove('on');replay.style.visibility='hidden';window.__introStop();
-  menu.classList.add('on');menu.setAttribute('aria-hidden','false');cancelAnimationFrame(raf);active=true;speed=RPS;last=0;camP=camFrom=camTo=1;view='top';back.textContent='Menú';
+  menu.classList.add('on');menu.setAttribute('aria-hidden','false');cancelAnimationFrame(raf);active=true;speed=RPS;last=0;direct=false;camP=camFrom=camTo=1;view='top';back.textContent='Menú';
   t0=performance.now()-2500;raf=requestAnimationFrame(draw);requestAnimationFrame(()=>requestAnimationFrame(()=>stage.style.transition=''));};
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth*2-1;my=e.clientY/innerHeight*2-1},{passive:true});
 function openMenu(){
