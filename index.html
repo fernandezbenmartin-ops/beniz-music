@@ -694,8 +694,13 @@ window.__goLyrics=()=>{if(view!=='top'||lyr)return;lyr=true;cam(-1);back.textCon
 // Si lo dejas vacío, el aviso te pedirá pegarlo y lo guardará en este navegador.
 const CLIENT_ID='';
 const SCOPES='user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing streaming playlist-read-private user-library-read';
-const REDIRECT=location.origin+location.pathname;
+const REDIRECT=location.origin+location.pathname.replace(/\/index\.html$/,'/');
 const K='beniz.spotify.';
+// en iPad/Safari la pestaña puede recargarse al volver de Spotify: guardamos el código en localStorage (y en sessionStorage por si acaso)
+const pkSet=v=>{const j=JSON.stringify(v);try{localStorage.setItem(K+'pkce',j)}catch(e){}try{sessionStorage.setItem(K+'pkce',j)}catch(e){}};
+const pkGet=()=>{let j=null;try{j=localStorage.getItem(K+'pkce')||sessionStorage.getItem(K+'pkce')}catch(e){}try{return JSON.parse(j)}catch(e){return null}};
+const pkDel=()=>{try{localStorage.removeItem(K+'pkce');sessionStorage.removeItem(K+'pkce')}catch(e){}};
+const standalone=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
 const $=id=>document.getElementById(id);
 const box=$('sp'),card=$('spCard'),chip=$('spchip');
 const LOGO='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm4.8 15.15a.65.65 0 0 1-.9.22c-2.46-1.5-5.56-1.84-9.2-1.01a.65.65 0 1 1-.3-1.27c3.99-.91 7.4-.52 10.18 1.17.3.19.4.59.22.89zm1.28-2.85a.82.82 0 0 1-1.12.27c-2.82-1.73-7.11-2.23-10.44-1.22a.82.82 0 1 1-.47-1.57c3.8-1.15 8.53-.59 11.77 1.4.38.24.5.74.26 1.12zm.11-2.97C14.8 8.8 9.2 8.61 5.96 9.6a.98.98 0 1 1-.57-1.88c3.72-1.13 9.9-.91 13.8 1.4a.98.98 0 1 1-1 1.7z"/></svg>';
@@ -713,7 +718,7 @@ async function login(){
   if(!window.isSecureContext||!crypto.subtle){render('connect','Abre la app desde http://127.0.0.1:… o desde una web https para poder conectar.');return}
   const v=rnd(64),st=rnd(16);
   const ch=b64u(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
-  sessionStorage.setItem(K+'pkce',JSON.stringify({v,st}));
+  pkSet({v,st,t:Date.now()});
   location.assign('https://accounts.spotify.com/authorize?'+new URLSearchParams({response_type:'code',client_id:id,scope:SCOPES,
     redirect_uri:REDIRECT,code_challenge_method:'S256',code_challenge:ch,state:st}));
 }
@@ -761,7 +766,7 @@ function render(state,err=''){
       <button class="splink" id="spLater">Ahora no</button>
       ${!CLIENT_ID&&!needId?`<br><button class="splink" id="spReset" style="margin-top:0">Cambiar Client ID</button>`:''}`;
     const inp=$('spCid');
-    $('spGo').onclick=()=>{if(inp){const v=inp.value.trim();if(!/^[0-9a-f]{32}$/i.test(v)){render('connect','Ese Client ID no parece válido: son 32 caracteres (letras y números).');setTimeout(()=>{const i=$('spCid');if(i){i.value=v;i.focus()}});return}localStorage.setItem(K+'cid',v)}login()};
+    $('spGo').onclick=()=>{if(inp){const v=inp.value.replace(/[^0-9a-f]/gi,'');if(!/^[0-9a-f]{32}$/i.test(v)){render('connect','Ese Client ID no parece válido: son 32 caracteres (letras y números).');setTimeout(()=>{const i=$('spCid');if(i){i.value=v;i.focus()}});return}localStorage.setItem(K+'cid',v)}login()};
     if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter')$('spGo').click()});
     $('spLater').onclick=()=>{dismissed=true;close()};
     if($('spReset'))$('spReset').onclick=()=>{localStorage.removeItem(K+'cid');render('connect')};
@@ -806,14 +811,13 @@ if(q.has('code')||q.has('error')){
   history.replaceState(null,'',REDIRECT);busy=true;
   addEventListener('load',()=>setTimeout(async()=>{
     window.__goListen&&window.__goListen();inListen=true;
-    let pk=null;try{pk=JSON.parse(sessionStorage.getItem(K+'pkce'))}catch(e){}
-    sessionStorage.removeItem(K+'pkce');
+    const pk=pkGet();pkDel();
     if(q.has('error')){busy=false;return open('connect',q.get('error')==='access_denied'?'Has cancelado la conexión. Puedes intentarlo cuando quieras.':'Spotify devolvió un error: '+q.get('error'))}
-    if(!pk||pk.st!==q.get('state')){busy=false;return open('connect','La conexión caducó o no coincide. Vuelve a intentarlo.')}
+    if(!pk||pk.st!==q.get('state')){busy=false;return open('connect',standalone?'Abre Beniz desde Safari (no desde el icono de la pantalla de inicio) para conectar Spotify la primera vez.':'La conexión caducó o no coincide. Vuelve a intentarlo.')}
     open('busy');
     try{save(await tokenReq({grant_type:'authorization_code',code:q.get('code'),redirect_uri:REDIRECT,client_id:cid(),code_verifier:pk.v}));
       await loadMe();busy=false;open('done');}
-    catch(e){busy=false;save(null);open('connect','No se pudo conectar: '+e.message)}
+    catch(e){busy=false;save(null);const m=String(e.message||'');open('connect',/redirect/i.test(m)?'La Redirect URI no coincide. En Spotify for Developers añade exactamente: '+REDIRECT:/client/i.test(m)?'El Client ID no es correcto. Pulsa «Cambiar Client ID» y pégalo otra vez.':'No se pudo conectar: '+m)}
   },0));
 }
 })();
